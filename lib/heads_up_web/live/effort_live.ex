@@ -27,7 +27,6 @@ defmodule HeadsUpWeb.EffortLive do
             value={@minutes_per_responder}
             type="number"
             phx-debounce="500"
-            phx-throttle="500"
           />
         </form>
         =

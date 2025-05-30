@@ -1,42 +1,64 @@
-defmodule HeadsUp.Incident do
-  defstruct [:id, :name, :description, :priority, :status, :image_path]
-end
-
 defmodule HeadsUp.Incidents do
+  alias HeadsUp.Incidents.Incident
+  alias HeadsUp.Repo
+  import Ecto.Query
+
   def list_incidents do
-    [
-      %HeadsUp.Incident{
-        id: 1,
-        name: "Lost Dog",
-        description: "A friendly dog is wandering around the neighborhood. 🐶",
-        priority: 2,
-        status: :pending,
-        image_path: "/images/lost-dog.jpg"
-      },
-      %HeadsUp.Incident{
-        id: 2,
-        name: "Flat Tire",
-        description: "Our beloved ice cream truck has a flat tire! 🛞",
-        priority: 1,
-        status: :resolved,
-        image_path: "/images/flat-tire.jpg"
-      },
-      %HeadsUp.Incident{
-        id: 3,
-        name: "Bear In The Trash",
-        description: "A curious bear is digging through the trash! 🐻",
-        priority: 1,
-        status: :canceled,
-        image_path: "/images/bear-in-trash.jpg"
-      }
-    ]
+    Repo.all(Incident)
   end
 
-  def get_incident(id) when is_integer(id) do
-    list_incidents() |> Enum.find(&(&1.id == id))
+  def filter_incidents(filter) do
+    Incident
+    |> with_status(filter["status"])
+    |> search_by(filter["q"])
+    |> sort(filter["sort_by"])
+    |> Repo.all()
   end
 
-  def get_incident(id) when is_binary(id) do
-    id |> String.to_integer() |> get_incident()
+  defp with_status(query, status)
+       when status in ~w(pending resolved canceled) do
+    where(query, status: ^status)
+  end
+
+  defp with_status(query, _), do: query
+
+  defp search_by(query, q) when q in ["", nil], do: query
+
+  defp search_by(query, q) do
+    where(query, [i], ilike(i.name, ^"%#{q}%"))
+  end
+
+  defp sort(query, "name") do
+    order_by(query, :name)
+  end
+
+  defp sort(query, "priority_desc") do
+    order_by(query, desc: :priority)
+  end
+
+  defp sort(query, "priority_asc") do
+    order_by(query, asc: :priority)
+  end
+
+  defp sort(query, _) do
+    order_by(query, :id)
+  end
+
+  def get_incident!(id) do
+    Repo.get!(Incident, id)
+  end
+
+  def urgent_incidents(incident) do
+    Incident
+    |> where(status: :pending)
+    |> where([i], i.id != ^incident.id)
+    |> order_by(asc: :priority)
+    |> limit(3)
+    |> Repo.all()
+  end
+
+  def status() do
+    Ecto.Enum.values(Incident, :status)
   end
 end
+

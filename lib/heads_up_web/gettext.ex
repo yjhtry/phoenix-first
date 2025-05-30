@@ -20,5 +20,6 @@ defmodule HeadsUpWeb.Gettext do
 
   See the [Gettext Docs](https://hexdocs.pm/gettext) for detailed usage.
   """
-  use Gettext, otp_app: :heads_up
+  use Gettext.Backend, otp_app: :heads_up
+  # use Gettext, otp_app: :heads_up
 end

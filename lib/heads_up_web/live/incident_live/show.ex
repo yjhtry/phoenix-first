@@ -4,9 +4,8 @@ defmodule HeadsUpWeb.IncidentLive.Show do
   import HeadsUpWeb.CustomComponents
 
   def mount(%{"id" => id}, _session, socket) do
-    incident = Incidents.get_incident(id)
-    urgent_incidents = Incidents.list_incidents()
-      |> Enum.filter(&(&1.id != String.to_integer(id)))
+    incident = Incidents.get_incident!(id)
+    urgent_incidents = Incidents.urgent_incidents(incident)
 
     socket = assign(
       socket,
@@ -19,7 +18,6 @@ defmodule HeadsUpWeb.IncidentLive.Show do
   end
   
   def render(assigns) do
-    IO.inspect([self(), 'Show render'])
     ~H"""
     <div class="incident-show">
       <div class="incident">
@@ -43,6 +41,7 @@ defmodule HeadsUpWeb.IncidentLive.Show do
           <.urgent_incidents incidents={@urgent_incidents} />
         </div>
       </div>
+      <.back navigate={~p"/incidents"}>All Incidents</.back>
     </div>
     """
   end
@@ -53,7 +52,9 @@ defmodule HeadsUpWeb.IncidentLive.Show do
       <h4>Urgent Incidents</h4>
       <ul class="incidents">
         <li :for={incident <- @incidents}>
-          <img src={incident.image_path} /> {incident.name}
+          <.link navigate={~p"/incidents/#{incident.id}"}>
+            <img src={incident.image_path} /> {incident.name}
+          </.link>
         </li>
       </ul>
     </section>
