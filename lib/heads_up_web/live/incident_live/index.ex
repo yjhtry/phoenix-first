@@ -8,14 +8,13 @@ defmodule HeadsUpWeb.IncidentLive.Index do
     {:ok, socket}
   end
 
-  def handle_params(params, uri, socket) do
+  def handle_params(params, _uri, socket) do
     socket = socket
       |> assign(:page_title, "Incidents")
       |> assign(:form, to_form(params))
-      |> stream(:incidents, Incidents.filter_incidents(params), reset: true)
+      |> stream(:incidents,  Incidents.filter_incidents(params), reset: true)
 
     {:noreply, socket}
-
   end
 
   def handle_event("filter", params, socket) do
@@ -85,11 +84,14 @@ defmodule HeadsUpWeb.IncidentLive.Index do
         prompt="Status"
         options={@status_options}
       />
-      <.input type="select" field={@form[:sort_by]} prompt="Sort By" options={[
+        <.input type="select" field={@form[:sort_by]} prompt="Sort By" options={[
           Name: "name",
           "Priority: High to Low": "priority_asc",
           "Priority: Low to High": "priority_desc"
-      ]} />
+        ]} />
+        <.link patch={~p"/incidents"}>
+          <.button type="button" >Reset</.button>
+        </.link>
       </.form>
     </div>
     """

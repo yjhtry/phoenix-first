@@ -1,9 +1,14 @@
 <header class="px-4 sm:px-6 lg:px-8">
-  <div class="flex items-center justify-end border-b border-zinc-100 py-3 text-sm">
+  <div class="flex items-center justify-between border-b border-zinc-100 py-4 text-sm">
     <div class="flex items-center gap-4">
       <a href="/welcome">
         <img src={~p"/images/heads-up-logo.png"} width="120" />
       </a>
+    </div>
+    <div class="flex items-center gap-4 font-semibold leading-6 text-zinc-900">
+      <.link navigate={~p"/admin/incidents"}>Admin Incidents</.link>
+      <.link navigate={~p"/incidents"}>Incidents</.link>
+      <.link navigate={~p"/effort"}>Effort</.link>
     </div>
   </div>
 </header>
