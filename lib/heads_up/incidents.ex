@@ -12,6 +12,7 @@ defmodule HeadsUp.Incidents do
     |> with_status(filter["status"])
     |> search_by(filter["q"])
     |> sort(filter["sort_by"])
+    |> preload([:category])
     |> Repo.all()
   end
 
@@ -45,7 +46,7 @@ defmodule HeadsUp.Incidents do
   end
 
   def get_incident!(id) do
-    Repo.get!(Incident, id)
+    Incident |> preload([:category]) |> Repo.get!(id)
   end
 
   def urgent_incidents(incident) do

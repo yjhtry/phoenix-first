@@ -10,12 +10,8 @@ defmodule HeadsUp.Admin do
       |> Repo.all()
   end
 
-  def incident_change(%Incident{} = incident, attr \\ %{}) do
-    incident
-      |> cast(attr, [:name, :description, :status, :priority, :image_path])
-      |> validate_required([:name, :description, :status, :priority, :image_path])
-      |> validate_length(:description, min: 10)
-      |> validate_number(:priority, greater_than_or_equal_to: 1, less_than_or_equal_to: 3)
+  def incident_change(%Incident{} = incident, attrs \\ %{}) do
+    Incident.changeset(incident, attrs)
   end
 
   def add_incident(%Incident{} = incident, attr \\ %{}) do

@@ -35,6 +35,15 @@ defmodule HeadsUpWeb.Router do
     live "/admin/incidents", AdminIncidentLive.Index
     live "/admin/incidents/add", AdminIncidentLive.Form, :new
     live "/admin/incidents/:id/edit", AdminIncidentLive.Form, :edit
+
+    live "/admin/categories", AdminCategoryLive.Index, :index
+    live "/admin/categories/new", AdminCategoryLive.Index, :new
+    live "/admin/categories/:id/edit", AdminCategoryLive.Index, :edit
+
+    live "/admin/categories/:id", AdminCategoryLive.Show, :show
+    live "/admin/categories/:id/show/edit", AdminCategoryLive.Show, :edit
+
+
   end
 
   # Other scopes may use custom stacks.
