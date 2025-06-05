@@ -1,12 +1,14 @@
 defmodule HeadsUpWeb.AdminIncidentLive.Index do
   use HeadsUpWeb, :live_view
   alias HeadsUp.Admin
-  import  HeadsUpWeb.CustomComponents
+  import HeadsUpWeb.CustomComponents
 
   def mount(_params, _session, socket) do
-    socket = socket
+    socket =
+      socket
       |> assign(:page_title, "Admin incidents")
       |> stream(:incidents, Admin.list_incidents())
+
     {:ok, socket}
   end
 
@@ -24,16 +26,10 @@ defmodule HeadsUpWeb.AdminIncidentLive.Index do
   def render(assigns) do
     ~H"""
     <div class="admin-index">
-      <.button phx-click={
-        JS.toggle(to: "#joke", in: "fade-in", out: "fade-out")
-      }>
+      <.button phx-click={JS.toggle(to: "#joke", in: "fade-in", out: "fade-out")}>
         Toggle Joke
       </.button>
-      <div
-        id="joke"
-        class="joke hidden"
-        phx-click={JS.toggle_class("blur")}
-      >
+      <div id="joke" class="joke hidden" phx-click={JS.toggle_class("blur")}>
         What can i say ? manba out!
       </div>
       <.header class="mt-6">
@@ -41,7 +37,7 @@ defmodule HeadsUpWeb.AdminIncidentLive.Index do
         <:actions>
           <.link navigate={~p"/admin/incidents/add"}>
             <.button type="button">
-                Create
+              Create
             </.button>
           </.link>
         </:actions>
@@ -69,7 +65,8 @@ defmodule HeadsUpWeb.AdminIncidentLive.Index do
           <.link
             phx-click={delete_and_hide(dom_id, incident)}
             phx-value-id={incident.id}
-            data-confirm={"Are you sure to delete: `#{incident.name}` incident?"}>
+            data-confirm={"Are you sure to delete: `#{incident.name}` incident?"}
+          >
             <.icon name="hero-trash" class="h-4 w-4" />
           </.link>
         </:action>

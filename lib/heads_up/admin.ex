@@ -6,22 +6,22 @@ defmodule HeadsUp.Admin do
 
   def list_incidents do
     Incident
-      |> order_by(desc: :inserted_at)
-      |> Repo.all()
+    |> order_by(desc: :inserted_at)
+    |> Repo.all()
   end
 
   def incident_change(%Incident{} = incident, attrs \\ %{}) do
     Incident.changeset(incident, attrs)
   end
 
-  def add_incident(%Incident{} = incident, attr \\ %{}) do
+  def create_incident(%Incident{} = incident, attr \\ %{}) do
     incident_change(incident, attr)
-      |> Repo.insert()
+    |> Repo.insert()
   end
 
   def edit_incident(%Incident{} = incident, attr \\ %{}) do
     incident_change(incident, attr)
-      |> Repo.update()
+    |> Repo.update()
   end
 
   def get_incident!(id) do

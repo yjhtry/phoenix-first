@@ -104,7 +104,19 @@ defmodule HeadsUp.Categories do
 
   def list_names_with_ids() do
     Category
-      |> select([c], {c.name, c.id})
-      |> Repo.all()
+    |> select([c], {c.name, c.id})
+    |> Repo.all()
+  end
+
+  def list_names_with_slugs() do
+    Category
+    |> select([c], {c.name, c.slug})
+    |> Repo.all()
+  end
+
+  def get_category_with_incidents!(id) do
+    Category
+    |> preload([:incidents])
+    |> Repo.get(id)
   end
 end

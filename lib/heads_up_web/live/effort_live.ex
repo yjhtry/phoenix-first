@@ -5,13 +5,16 @@ defmodule HeadsUpWeb.EffortLive do
     if connected?(socket) do
       Process.send_after(self(), :update, 2000)
     end
-    socket = assign(socket,
-      responders: 0,
-      minutes_per_responder: 10,
-      page_title: "Effort"
-    )
+
+    socket =
+      assign(socket,
+        responders: 0,
+        minutes_per_responder: 10,
+        page_title: "Effort"
+      )
+
     {:ok, socket}
-  end 
+  end
 
   def render(assigns) do
     ~H"""
@@ -22,12 +25,7 @@ defmodule HeadsUpWeb.EffortLive do
         <div>{@responders}</div>
         &times;
         <form class="!mt-0" phx-change="recaculate">
-          <input 
-            name="minutes"
-            value={@minutes_per_responder}
-            type="number"
-            phx-debounce="500"
-          />
+          <input name="minutes" value={@minutes_per_responder} type="number" phx-debounce="500" />
         </form>
         =
         <div>{@responders * @minutes_per_responder}</div>
@@ -48,5 +46,4 @@ defmodule HeadsUpWeb.EffortLive do
     Process.send_after(self(), :update, 2000)
     {:noreply, update(socket, :responders, &(&1 + 10))}
   end
-
 end

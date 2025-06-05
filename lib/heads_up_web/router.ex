@@ -14,7 +14,7 @@ defmodule HeadsUpWeb.Router do
   def snoop(conn, _opts) do
     answer = ~w(Yes No Maybe) |> Enum.random()
 
-     assign(conn, :answer, answer)
+    assign(conn, :answer, answer)
   end
 
   pipeline :api do
@@ -42,14 +42,17 @@ defmodule HeadsUpWeb.Router do
 
     live "/admin/categories/:id", AdminCategoryLive.Show, :show
     live "/admin/categories/:id/show/edit", AdminCategoryLive.Show, :edit
-
-
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", HeadsUpWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", HeadsUpWeb.Api do
+    pipe_through :api
+
+    get "/incidents", IncidentController, :index
+    post "/incidents", IncidentController, :create
+    get "/incidents/:id", IncidentController, :show
+    get "/categories/:id/incidents", CategoryController, :show
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:heads_up, :dev_routes) do

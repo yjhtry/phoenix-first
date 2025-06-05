@@ -1,5 +1,6 @@
 defmodule HeadsUp.Incidents do
   alias HeadsUp.Incidents.Incident
+  alias HeadsUp.Categories.Category
   alias HeadsUp.Repo
   import Ecto.Query
 
@@ -11,6 +12,7 @@ defmodule HeadsUp.Incidents do
     Incident
     |> with_status(filter["status"])
     |> search_by(filter["q"])
+    |> with_category(filter["slug"])
     |> sort(filter["sort_by"])
     |> preload([:category])
     |> Repo.all()
@@ -19,6 +21,14 @@ defmodule HeadsUp.Incidents do
   defp with_status(query, status)
        when status in ~w(pending resolved canceled) do
     where(query, status: ^status)
+  end
+
+  defp with_category(query, slug) when slug in ["", nil], do: query
+
+  defp with_category(query, slug) do
+    query
+    |> join(:inner, [i], c in assoc(i, :category))
+    |> where([_, c], c.slug == ^slug)
   end
 
   defp with_status(query, _), do: query
@@ -41,6 +51,12 @@ defmodule HeadsUp.Incidents do
     order_by(query, asc: :priority)
   end
 
+  defp sort(query, "category") do
+    query
+    |> join(:inner, [i], c in assoc(i, :category))
+    |> order_by([_, c], c.name)
+  end
+
   defp sort(query, _) do
     order_by(query, :id)
   end
@@ -51,6 +67,7 @@ defmodule HeadsUp.Incidents do
 
   def urgent_incidents(incident) do
     Process.sleep(2000)
+
     Incident
     |> where(status: :pending)
     |> where([i], i.id != ^incident.id)
@@ -63,4 +80,3 @@ defmodule HeadsUp.Incidents do
     Ecto.Enum.values(Incident, :status)
   end
 end
-
