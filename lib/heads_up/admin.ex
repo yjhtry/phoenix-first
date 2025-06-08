@@ -2,7 +2,6 @@ defmodule HeadsUp.Admin do
   alias HeadsUp.Incidents.Incident
   alias HeadsUp.Repo
   import Ecto.Query
-  import Ecto.Changeset
 
   def list_incidents do
     Incident

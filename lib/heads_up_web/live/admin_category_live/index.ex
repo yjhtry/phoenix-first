@@ -1,8 +1,7 @@
 defmodule HeadsUpWeb.AdminCategoryLive.Index do
   use HeadsUpWeb, :live_view
 
-  alias HeadsUp.Categories
-  alias HeadsUp.Categories.Category
+  alias HeadsUp.{Categories, Categories.Category}
 
   @impl true
   def mount(_params, _session, socket) do

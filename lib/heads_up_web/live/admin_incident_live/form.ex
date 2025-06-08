@@ -1,9 +1,6 @@
 defmodule HeadsUpWeb.AdminIncidentLive.Form do
   use HeadsUpWeb, :live_view
-  alias HeadsUp.Categories
-  alias HeadsUp.Incidents
-  alias HeadsUp.Incidents.Incident
-  alias HeadsUp.Admin
+  alias HeadsUp.{Admin, Categories, Incidents, Incidents.Incident}
 
   def mount(params, _session, socket) do
     socket =

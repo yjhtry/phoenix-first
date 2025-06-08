@@ -1,8 +1,7 @@
 defmodule HeadsUpWeb.IncidentLive.Index do
   use HeadsUpWeb, :live_view
 
-  alias HeadsUp.Incidents
-  alias HeadsUp.Categories
+  alias HeadsUp.{Incidents, Categories}
   import HeadsUpWeb.CustomComponents
 
   def mount(_params, _session, socket) do

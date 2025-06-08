@@ -1,6 +1,5 @@
 defmodule HeadsUp.Incidents do
   alias HeadsUp.Incidents.Incident
-  alias HeadsUp.Categories.Category
   alias HeadsUp.Repo
   import Ecto.Query
 
@@ -23,6 +22,8 @@ defmodule HeadsUp.Incidents do
     where(query, status: ^status)
   end
 
+  defp with_status(query, _), do: query
+
   defp with_category(query, slug) when slug in ["", nil], do: query
 
   defp with_category(query, slug) do
@@ -30,8 +31,6 @@ defmodule HeadsUp.Incidents do
     |> join(:inner, [i], c in assoc(i, :category))
     |> where([_, c], c.slug == ^slug)
   end
-
-  defp with_status(query, _), do: query
 
   defp search_by(query, q) when q in ["", nil], do: query
 
