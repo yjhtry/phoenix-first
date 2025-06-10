@@ -1,11 +1,12 @@
 defmodule HeadsUp.Admin do
-  alias HeadsUp.Incidents.Incident
+  alias HeadsUp.{Incidents.Incident, Incidents}
   alias HeadsUp.Repo
   import Ecto.Query
 
   def list_incidents do
     Incident
-    |> order_by(desc: :inserted_at)
+    |> preload(:heroic_response)
+    |> order_by(desc: :updated_at)
     |> Repo.all()
   end
 
@@ -21,6 +22,13 @@ defmodule HeadsUp.Admin do
   def edit_incident(%Incident{} = incident, attr \\ %{}) do
     incident_change(incident, attr)
     |> Repo.update()
+    |> case  do
+      {:ok, incident} -> 
+        incident = Repo.preload(incident, [:category, heroic_response: :user])
+        Incidents.broadcast(incident.id, {:incident_updated, incident})
+        {:ok, incident}
+      {:error, _} = error -> error
+    end
   end
 
   def get_incident!(id) do
@@ -29,5 +37,19 @@ defmodule HeadsUp.Admin do
 
   def delete_incident!(%Incident{} = incident) do
     Repo.delete!(incident)
+  end
+
+  def draw_heroic_response(%Incident{status: :resolved} = incident) do
+    incident = Repo.preload(incident, [:responses])
+    case incident.responses do
+      [] -> {:error, "No response to draw!"}
+      responses -> 
+        response = Enum.random(responses)
+        edit_incident(incident, %{heroic_response_id: response.id})
+    end
+  end
+
+  def draw_heroic_response(%Incident{}) do
+    {:error, "Incident must be resolved to draw a heroic response!"}
   end
 end

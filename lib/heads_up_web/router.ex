@@ -32,16 +32,20 @@ defmodule HeadsUpWeb.Router do
     get "/tips", TipController, :index
     get "/tips/:id", TipController, :show
 
-    live "/effort", EffortLive
-    live "/incidents", IncidentLive.Index
-    live "/incidents/:id", IncidentLive.Show
+    live_session :public,
+      on_mount: {HeadsUpWeb.UserAuth, :mount_current_user} do
+
+      live "/effort", EffortLive
+      live "/incidents", IncidentLive.Index
+      live "/incidents/:id", IncidentLive.Show
+    end
   end
 
   scope "/", HeadsUpWeb do
-    pipe_through [:browser, :require_authenticated_user]
+    pipe_through [:browser, :require_admin_user]
 
     live_session :admin,
-      on_mount: {HeadsUpWeb.UserAuth, :ensure_authenticated} do
+      on_mount: {HeadsUpWeb.UserAuth, :ensure_admin} do
 
       live "/admin/incidents", AdminIncidentLive.Index
       live "/admin/incidents/add", AdminIncidentLive.Form, :new

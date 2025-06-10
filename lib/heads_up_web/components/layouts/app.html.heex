@@ -5,9 +5,9 @@
         <img src={~p"/images/heads-up-logo.png"} width="120" />
       </a>
     </div> 
-    <div class="flex grow-1 items-center gap-4 font-semibold leading-6 text-zinc-900">
-      <.link navigate={~p"/admin/incidents"}>Admin Incidents</.link>
-      <.link navigate={~p"/admin/categories"}>Admin Categories</.link>
+    <div  class="flex grow-1 items-center gap-4 font-semibold leading-6 text-zinc-900">
+      <.link :if={assigns[:current_user] && @current_user.is_admin} navigate={~p"/admin/incidents"}>Admin Incidents</.link>
+      <.link :if={assigns[:current_user] && @current_user.is_admin} navigate={~p"/admin/categories"}>Admin Categories</.link>
       <.link navigate={~p"/incidents"}>Incidents</.link>
       <.link navigate={~p"/effort"}>Effort</.link>
     </div>

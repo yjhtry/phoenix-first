@@ -61,12 +61,10 @@ defmodule HeadsUp.Incidents do
   end
 
   def get_incident!(id) do
-    Incident |> preload([:category]) |> Repo.get!(id)
+    Incident |> preload([:category, heroic_response: :user]) |> Repo.get!(id)
   end
 
   def urgent_incidents(incident) do
-    Process.sleep(2000)
-
     Incident
     |> where(status: :pending)
     |> where([i], i.id != ^incident.id)
@@ -77,5 +75,21 @@ defmodule HeadsUp.Incidents do
 
   def status() do
     Ecto.Enum.values(Incident, :status)
+  end
+
+  def list_responses(incident) do
+    incident
+      |> Ecto.assoc(:responses)
+      |> preload(:user)
+      |> order_by(desc: :inserted_at)
+      |> Repo.all()
+  end
+
+  def subscribe(incident_id) do
+    Phoenix.PubSub.subscribe(HeadsUp.PubSub, "incident:##{incident_id}")
+  end
+
+  def broadcast(incident_id, message) do
+    Phoenix.PubSub.broadcast(HeadsUp.PubSub, "incident:##{incident_id}", message)
   end
 end

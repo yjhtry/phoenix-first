@@ -164,6 +164,21 @@ defmodule HeadsUpWeb.UserAuth do
     end
   end
 
+  def on_mount(:ensure_admin, _params, session, socket) do
+    socket = mount_current_user(socket, session)
+
+    if socket.assigns.current_user && socket.assigns.current_user.is_admin do
+      {:cont, socket}
+    else
+      socket =
+        socket
+        |> Phoenix.LiveView.put_flash(:error, "Only admin allowed!")
+        |> Phoenix.LiveView.redirect(to: ~p"/incidents")
+
+      {:halt, socket}
+    end
+  end
+
   def on_mount(:redirect_if_user_is_authenticated, _params, session, socket) do
     socket = mount_current_user(socket, session)
 
@@ -213,6 +228,18 @@ defmodule HeadsUpWeb.UserAuth do
     end
   end
 
+  def require_admin_user(conn, _opts) do
+    if conn.assigns[:current_user] && conn.assigns.current_user.is_admin do
+      conn
+    else
+      conn
+      |> put_flash(:error, "Only admin allowed!")
+      |> maybe_store_return_to()
+      |> redirect(to: ~p"/incidents")
+      |> halt()
+    end
+  end
+
   defp put_token_in_session(conn, token) do
     conn
     |> put_session(:user_token, token)
@@ -225,5 +252,5 @@ defmodule HeadsUpWeb.UserAuth do
 
   defp maybe_store_return_to(conn), do: conn
 
-  defp signed_in_path(_conn), do: ~p"/"
+  defp signed_in_path(_conn), do: ~p"/incidents"
 end
