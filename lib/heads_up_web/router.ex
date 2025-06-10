@@ -34,7 +34,6 @@ defmodule HeadsUpWeb.Router do
 
     live_session :public,
       on_mount: {HeadsUpWeb.UserAuth, :mount_current_user} do
-
       live "/effort", EffortLive
       live "/incidents", IncidentLive.Index
       live "/incidents/:id", IncidentLive.Show
@@ -46,7 +45,6 @@ defmodule HeadsUpWeb.Router do
 
     live_session :admin,
       on_mount: {HeadsUpWeb.UserAuth, :ensure_admin} do
-
       live "/admin/incidents", AdminIncidentLive.Index
       live "/admin/incidents/add", AdminIncidentLive.Form, :new
       live "/admin/incidents/:id/edit", AdminIncidentLive.Form, :edit
@@ -56,6 +54,8 @@ defmodule HeadsUpWeb.Router do
       live "/admin/categories/:id/edit", AdminCategoryLive.Index, :edit
       live "/admin/categories/:id", AdminCategoryLive.Show, :show
       live "/admin/categories/:id/show/edit", AdminCategoryLive.Show, :edit
+
+      live "/admin/users", AdminUserLive.Index
     end
   end
 

@@ -21,10 +21,11 @@ defmodule HeadsUp.Responses do
     |> IO.inspect()
     |> Response.changeset(attrs)
     |> Repo.insert()
-    |> case  do
-      {:ok, response} -> 
+    |> case do
+      {:ok, response} ->
         Incidents.broadcast(incident.id, {:response_created, response})
-        {:ok,  response}
+        {:ok, response}
+
       {:error, _} = error ->
         error
     end

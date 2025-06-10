@@ -62,8 +62,8 @@ defmodule HeadsUpWeb.AdminIncidentLive.Index do
             <.icon name="hero-trash" class="h-4 w-4" />
           </.link>
         </:action>
-        <:action :let={{dom_id, incident}}>
-          <.link phx-click="draw-response" phx-value-id={incident.id} >
+        <:action :let={{_dom_id, incident}}>
+          <.link phx-click="draw-response" phx-value-id={incident.id}>
             Draw Response
           </.link>
         </:action>
@@ -82,12 +82,14 @@ defmodule HeadsUpWeb.AdminIncidentLive.Index do
     incident = Admin.get_incident!(id)
 
     case Admin.draw_heroic_response(incident) do
-      {:ok, incident} -> 
-        socket = socket
+      {:ok, incident} ->
+        socket =
+          socket
           |> put_flash(:info, "Heroic response drawn!")
           |> stream_insert(:incidents, incident)
 
         {:noreply, socket}
+
       {:error, error} ->
         {:noreply, put_flash(socket, :error, error)}
     end

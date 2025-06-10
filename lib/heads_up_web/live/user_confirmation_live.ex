@@ -34,9 +34,9 @@ defmodule HeadsUpWeb.UserConfirmationLive do
     case Accounts.confirm_user(token) do
       {:ok, _} ->
         {:noreply,
-          socket
-          |> put_flash(:info, "User confirmed successfully.")
-          |> redirect(to: ~p"/")}
+         socket
+         |> put_flash(:info, "User confirmed successfully.")
+         |> redirect(to: ~p"/")}
 
       :error ->
         # If there is a current user and the account was already confirmed,

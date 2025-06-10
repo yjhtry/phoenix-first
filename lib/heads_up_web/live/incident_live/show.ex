@@ -5,8 +5,11 @@ defmodule HeadsUpWeb.IncidentLive.Show do
 
   def mount(_params, _session, socket) do
     response_change = Responses.change_response(%Response{})
-    socket = socket
+
+    socket =
+      socket
       |> assign(form: to_form(response_change))
+
     {:ok, socket}
   end
 
@@ -14,6 +17,7 @@ defmodule HeadsUpWeb.IncidentLive.Show do
     if connected?(socket) do
       Incidents.subscribe(id)
     end
+
     incident = Incidents.get_incident!(id)
     responses = Incidents.list_responses(incident)
 
@@ -63,7 +67,7 @@ defmodule HeadsUpWeb.IncidentLive.Show do
       <div class="activity">
         <div class="left">
           <div :if={@incident.status == :pending}>
-            <%= if @current_user do%>
+            <%= if @current_user do %>
               <.response_form form={@form} />
             <% else %>
               <.link href={~p"/users/log_in"} class="button">
@@ -72,7 +76,11 @@ defmodule HeadsUpWeb.IncidentLive.Show do
             <% end %>
           </div>
           <div id="responses" phx-update="stream">
-            <.response :for={{dom_id, response} <- @streams.responses} response={response} id={dom_id} />
+            <.response
+              :for={{dom_id, response} <- @streams.responses}
+              response={response}
+              id={dom_id}
+            />
           </div>
         </div>
         <div class="right">
@@ -123,7 +131,8 @@ defmodule HeadsUpWeb.IncidentLive.Show do
         options={[:enroute, :arrived, :departed]}
       />
 
-      <.input field={@form[:note]}
+      <.input
+        field={@form[:note]}
         type="textarea"
         phx-debounce="blur"
         placeholder="Note..."
@@ -165,34 +174,41 @@ defmodule HeadsUpWeb.IncidentLive.Show do
   def handle_event("validate", %{"response" => params}, socket) do
     response_change = Responses.change_response(%Response{}, params)
 
-    socket = socket
+    socket =
+      socket
       |> assign(form: to_form(response_change, action: :validate))
+
     {:noreply, socket}
   end
 
   def handle_event("save", %{"response" => params}, socket) do
-    %{incident: incident, current_user: user } = socket.assigns
+    %{incident: incident, current_user: user} = socket.assigns
 
     case Responses.create_response(incident, user, params) do
-      {:ok, _response} -> 
+      {:ok, _response} ->
         changeset = Responses.change_response(%Response{})
         {:noreply, assign(socket, :form, to_form(changeset))}
+
       {:error, changeset} ->
         {:noreply, assign(socket, form: to_form(changeset))}
     end
   end
 
   def handle_info({:response_created, response}, socket) do
-    socket = socket
+    socket =
+      socket
       |> update(:response_count, &(&1 + 1))
       |> stream_insert(:responses, response, at: 0)
+
     {:noreply, socket}
   end
 
   def handle_info({:incident_updated, incident}, socket) do
-    socket = socket
+    socket =
+      socket
       |> assign(page_title: incident.name)
       |> assign(:incident, incident)
+
     {:noreply, socket}
   end
 end

@@ -49,9 +49,9 @@ defmodule HeadsUp.Accounts.User do
 
   defp validate_username(changeset) do
     changeset
-      |> validate_required([:username])
-      |> validate_length(:username, min: 2, max: 32)
-      |> unique_constraint(:username)
+    |> validate_required([:username])
+    |> validate_length(:username, min: 2, max: 32)
+    |> unique_constraint(:username)
   end
 
   defp validate_email(changeset, opts) do

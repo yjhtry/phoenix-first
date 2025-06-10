@@ -20,7 +20,15 @@ defmodule HeadsUp.Incidents.Incident do
   @doc false
   def changeset(incident, attrs) do
     incident
-    |> cast(attrs, [:name, :description, :status, :priority, :image_path, :category_id, :heroic_response_id])
+    |> cast(attrs, [
+      :name,
+      :description,
+      :status,
+      :priority,
+      :image_path,
+      :category_id,
+      :heroic_response_id
+    ])
     |> validate_required([:name, :description, :status, :priority, :image_path, :category_id])
     |> validate_length(:description, min: 10)
     |> validate_inclusion(:priority, 1..3)

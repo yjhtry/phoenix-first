@@ -79,10 +79,10 @@ defmodule HeadsUp.Incidents do
 
   def list_responses(incident) do
     incident
-      |> Ecto.assoc(:responses)
-      |> preload(:user)
-      |> order_by(desc: :inserted_at)
-      |> Repo.all()
+    |> Ecto.assoc(:responses)
+    |> preload(:user)
+    |> order_by(desc: :inserted_at)
+    |> Repo.all()
   end
 
   def subscribe(incident_id) do

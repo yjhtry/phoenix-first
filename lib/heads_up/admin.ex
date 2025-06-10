@@ -22,12 +22,14 @@ defmodule HeadsUp.Admin do
   def edit_incident(%Incident{} = incident, attr \\ %{}) do
     incident_change(incident, attr)
     |> Repo.update()
-    |> case  do
-      {:ok, incident} -> 
+    |> case do
+      {:ok, incident} ->
         incident = Repo.preload(incident, [:category, heroic_response: :user])
         Incidents.broadcast(incident.id, {:incident_updated, incident})
         {:ok, incident}
-      {:error, _} = error -> error
+
+      {:error, _} = error ->
+        error
     end
   end
 
@@ -41,9 +43,12 @@ defmodule HeadsUp.Admin do
 
   def draw_heroic_response(%Incident{status: :resolved} = incident) do
     incident = Repo.preload(incident, [:responses])
+
     case incident.responses do
-      [] -> {:error, "No response to draw!"}
-      responses -> 
+      [] ->
+        {:error, "No response to draw!"}
+
+      responses ->
         response = Enum.random(responses)
         edit_incident(incident, %{heroic_response_id: response.id})
     end
