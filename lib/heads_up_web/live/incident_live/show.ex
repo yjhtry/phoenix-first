@@ -1,6 +1,7 @@
 defmodule HeadsUpWeb.IncidentLive.Show do
   use HeadsUpWeb, :live_view
   alias HeadsUp.{Incidents, Responses, Responses.Response}
+  alias HeadsUpWeb.Presence
   import HeadsUpWeb.CustomComponents
 
   def mount(_params, _session, socket) do
@@ -16,14 +17,27 @@ defmodule HeadsUpWeb.IncidentLive.Show do
   def handle_params(%{"id" => id}, _url, socket) do
     if connected?(socket) do
       Incidents.subscribe(id)
+
+      if socket.assigns[:current_user] do
+        %{current_user: current_user} = socket.assigns
+
+        Presence.track(self(), topic(id), current_user.username, %{
+          online_at: System.system_time(:second)
+        })
+        Phoenix.PubSub.subscribe(HeadsUp.PubSub, "update" <> topic(id))
+      end
     end
 
     incident = Incidents.get_incident!(id)
     responses = Incidents.list_responses(incident)
+    presences = Presence.list(topic(id))
+
+    presences = Enum.map(presences, fn {username, %{metas: metas}} -> %{id: username, metas: metas} end)
 
     socket =
       socket
       |> assign(incident: incident, page_title: incident.name)
+      |> stream(:presences, presences)
       |> stream(:responses, responses)
       |> assign(response_count: Enum.count(responses))
       |> assign_async(:urgent_incidents, fn ->
@@ -31,6 +45,10 @@ defmodule HeadsUpWeb.IncidentLive.Show do
       end)
 
     {:noreply, socket}
+  end
+
+  defp topic(incident_id) do
+    "incident_onlookers:#{incident_id}"
   end
 
   def render(assigns) do
@@ -85,6 +103,7 @@ defmodule HeadsUpWeb.IncidentLive.Show do
         </div>
         <div class="right">
           <.urgent_incidents incidents={@urgent_incidents} />
+          <.onlookers :if={@current_user} presences={@streams.presences} />
         </div>
       </div>
       <.back navigate={~p"/incidents"}>All Incidents</.back>
@@ -171,6 +190,22 @@ defmodule HeadsUpWeb.IncidentLive.Show do
     """
   end
 
+  attr :presences, :any, required: true
+
+  def onlookers(assigns) do
+    ~H"""
+    <section>
+      <h4>Onlookers</h4>
+      <ul class="presences" id="onlookers" phx-update="stream">
+        <li :for={{dom_id, presence} <- @presences} id={dom_id}>
+          <.icon name="hero-user-circle-solid" class="w-5 h-5" />
+          {"#{presence.id}(#{length(presence.metas)})"}
+        </li>
+      </ul>
+    </section>
+    """
+  end
+
   def handle_event("validate", %{"response" => params}, socket) do
     response_change = Responses.change_response(%Response{}, params)
 
@@ -210,5 +245,18 @@ defmodule HeadsUpWeb.IncidentLive.Show do
       |> assign(:incident, incident)
 
     {:noreply, socket}
+  end
+
+  def handle_info({:user_joined, presence}, socket) do
+    {:noreply, stream_insert(socket, :presences, presence)}
+  end
+
+  def handle_info({:user_leaved, presence}, socket) do
+    case presence.metas do
+      [] -> 
+        {:noreply, stream_delete(socket, :presences, presence)}
+      _ -> 
+        {:noreply, stream_insert(socket, :presences, presence)}
+    end
   end
 end

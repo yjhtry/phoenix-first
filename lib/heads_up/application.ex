@@ -17,7 +17,8 @@ defmodule HeadsUp.Application do
       # Start a worker by calling: HeadsUp.Worker.start_link(arg)
       # {HeadsUp.Worker, arg},
       # Start to serve requests, typically the last entry
-      HeadsUpWeb.Endpoint
+      HeadsUpWeb.Endpoint,
+      HeadsUpWeb.Presence,
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
