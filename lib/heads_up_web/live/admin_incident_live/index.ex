@@ -24,7 +24,10 @@ defmodule HeadsUpWeb.AdminIncidentLive.Index do
       <.header class="mt-6">
         {@page_title}
         <:actions>
-          <.link navigate={~p"/admin/incidents/add"}>
+          <.link href={~p"/api/admin/incidents/export"}>
+            <.button type="button" class="mr-4">
+              Export
+            </.button>
             <.button type="button">
               Create
             </.button>

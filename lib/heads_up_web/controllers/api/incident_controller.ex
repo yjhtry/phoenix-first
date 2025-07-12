@@ -30,4 +30,13 @@ defmodule HeadsUpWeb.Api.IncidentController do
       String.replace(acc, "%{#{key}}", fn _ -> to_string(value) end)
     end)
   end
+
+  def export(conn, _params) do
+    data =
+      Admin.list_incidents()
+      |> CSV.encode(headers: [:name, :status, :priority, :description])
+      |> Enum.to_list()
+
+    conn |> send_download({:binary, data}, filename: "export.csv")
+  end
 end
